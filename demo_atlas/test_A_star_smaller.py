@@ -1,0 +1,221 @@
+import tkinter as tk
+from itertools import count
+from turtle import RawTurtle, TurtleScreen
+
+from pyatlas.atlas import Atlas
+from pyproj import Geod
+from pyproj import Transformer
+
+import queue
+
+BORDER_SIZE = 5
+
+MAP_HEIGHT = 413
+MAP_WIDTH = 500
+
+LAT_1 = 21.01577
+LONG_1 = 105.80958
+
+LAT_2 = 21.02526
+LONG_2 = 105.82188
+
+transformer = Transformer.from_crs("EPSG:4326", "EPSG:3857")
+inverse_transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326")
+wgs84_geod = Geod(ellps='WGS84')
+
+atlas = Atlas('phuong_thanh_cong.atlas')
+
+X_1, Y_1 = transformer.transform(LAT_1, LONG_1)
+X_2, Y_2 = transformer.transform(LAT_2, LONG_2)
+
+start_x = 0
+start_y = 0
+start_node = atlas.nodes().__next__()
+
+end_x = 0
+end_y = 0
+end_node = start_node
+
+flag = 0
+
+unique = count()
+
+
+def distance(lat1, lon1, lat2, lon2):
+    az12, az21, dist = wgs84_geod.inv(lon1, lat1, lon2, lat2)
+    return dist
+
+
+def lat_long_2_turtle_pos(lat, long):
+    x, y = transformer.transform(lat, long)
+
+    turtle_x = MAP_WIDTH * (2 * x - X_1 - X_2) / (X_2 - X_1)
+    turtle_y = MAP_HEIGHT * (2 * y - Y_1 - Y_2) / (Y_2 - Y_1)
+
+    return turtle_x, turtle_y
+
+
+def turtle_pos_2_lat_long(turtle_x, turtle_y):
+    x = (turtle_x * (X_2 - X_1) / MAP_WIDTH + X_1 + X_2) / 2
+    y = (turtle_y * (Y_2 - Y_1) / MAP_HEIGHT + Y_1 + Y_2) / 2
+
+    return inverse_transformer.transform(x, y)
+
+
+def get_node_lat_long(node):
+    return node.as_location().get_latitude_deg(), node.as_location().get_longitude_deg()
+
+
+def get_location_lat_long(location):
+    return location.get_latitude_deg(), location.get_longitude_deg()
+
+
+def get_closest_node(lat, long):
+    closest_node = atlas.nodes().__next__()
+    for node in atlas.nodes():
+        if distance(lat, long, *get_node_lat_long(node)) < distance(lat, long, *get_node_lat_long(closest_node)):
+            closest_node = node
+
+    return closest_node
+
+
+def turtle_teleport(x, y):
+    turtle.up()
+    turtle.ht()
+    turtle.goto(x, y)
+    turtle.st()
+    turtle.down()
+
+
+def edge_start_with_and_end_with(node1, node2):
+    for edge in node1.out_edges():
+        if edge.end() == node2:
+            return edge
+
+
+def on_click(event_origin):
+    global flag, start_node, end_node, start_x, start_y, end_x, end_y
+
+    print(event_origin.x, event_origin.y)
+    print('\n')
+
+    if flag == 0:
+        start_x = event_origin.x - MAP_WIDTH - BORDER_SIZE
+        start_y = -event_origin.y + MAP_HEIGHT - BORDER_SIZE
+
+        start_node = get_closest_node(*turtle_pos_2_lat_long(start_x, start_y))
+
+        turtle_teleport(start_x, start_y)
+        turtle.width(5)
+        turtle.goto(start_x, start_y)
+        turtle.width(2)
+
+        turtle.goto(*lat_long_2_turtle_pos(*get_node_lat_long(start_node)))
+        flag += 1
+    elif flag == 1:
+        end_x = event_origin.x - MAP_WIDTH - BORDER_SIZE
+        end_y = -event_origin.y + MAP_HEIGHT - BORDER_SIZE
+
+        end_node = get_closest_node(*turtle_pos_2_lat_long(end_x, end_y))
+
+        screen.tracer(0, 0)
+        turtle.width(5)
+        turtle_teleport(end_x, end_y)
+        turtle.goto(end_x, end_y)
+        turtle.width(2)
+
+        turtle_teleport(start_x, start_y)
+        screen.update()
+
+        # Setup Turtle
+        screen.tracer(50, 0)
+
+        # A_star Start
+        visited = set()
+        fringe = queue.PriorityQueue()
+        parent = {}
+        distance_from_start_to = {start_node: 0}
+
+        fringe.put((distance(*get_node_lat_long(start_node), *get_node_lat_long(end_node)), next(unique), start_node))
+        parent[start_node] = start_node
+        visited.add(start_node)
+
+        while not fringe.empty():
+            current_node = fringe.get()[2]
+
+            if current_node == end_node:
+                break
+
+            turtle_teleport(*lat_long_2_turtle_pos(*get_node_lat_long(parent[current_node])))
+            turtle.goto(lat_long_2_turtle_pos(*get_node_lat_long(current_node)))
+
+            for out_edge in current_node.out_edges():
+                if out_edge.get_highway_tag_value() is not None and out_edge.get_highway_tag_value() != 'footway' and out_edge.end() not in visited:
+                    visited.add(out_edge.end())
+                    distance_from_start_to[out_edge.end()] = distance_from_start_to[current_node] + distance(*get_node_lat_long(current_node), *get_node_lat_long(out_edge.end()))
+                    fringe.put((distance_from_start_to[out_edge.end()] + distance(*get_node_lat_long(out_edge.end()), *get_node_lat_long(end_node)), next(unique), out_edge.end()))
+                    parent[out_edge.end()] = current_node
+
+        turtle.clear()
+        previous_node = end_node
+        current_node = parent[end_node]
+        turtle_teleport(end_x, end_y)
+        turtle.goto(lat_long_2_turtle_pos(*get_node_lat_long(end_node)))
+
+        while parent.get(current_node, current_node) != current_node:
+            edge = edge_start_with_and_end_with(current_node, previous_node)
+
+            turtle_teleport(*lat_long_2_turtle_pos(*get_node_lat_long(edge.start())))
+
+            for location in edge.as_polyline().locations():
+                turtle.goto(*lat_long_2_turtle_pos(*get_location_lat_long(location)))
+
+            previous_node = current_node
+            current_node = parent.get(current_node, current_node)
+
+        edge = edge_start_with_and_end_with(start_node, previous_node)
+
+        turtle_teleport(*lat_long_2_turtle_pos(*get_node_lat_long(edge.start())))
+
+        for location in edge.as_polyline().locations():
+            turtle.goto(*lat_long_2_turtle_pos(*get_location_lat_long(location)))
+
+        turtle.goto(lat_long_2_turtle_pos(*get_node_lat_long(current_node)))
+        turtle.goto(start_x, start_y)
+
+        turtle.width(5)
+        turtle.goto(start_x, start_y)
+        turtle.width(2)
+        # A_star End
+
+        screen.update()
+        screen.tracer(1, 0)
+
+        turtle_teleport(end_x, end_y)
+        flag += 1
+    elif flag == 2:
+        turtle.clear()
+        flag = 0
+
+
+root = tk.Tk()
+root.focus()
+root.bind("<Button 1>", on_click)
+
+canvas2 = tk.Canvas(root, width=2*MAP_WIDTH, height=2*MAP_HEIGHT)
+canvas2.pack()
+
+screen = TurtleScreen(canvas2)
+screen.bgpic('map-7-scaled.gif')
+turtle = RawTurtle(screen)
+
+# Test
+print(lat_long_2_turtle_pos(*turtle_pos_2_lat_long(30, 300)))
+
+# Turtle setup
+turtle.speed(0)
+turtle.width(2)
+# screen.tracer(5, 0)
+
+# screen.mainloop()
+root.mainloop()
