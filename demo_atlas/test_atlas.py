@@ -2,4 +2,5 @@ from pyatlas.atlas import Atlas
 
 atlas = Atlas('phuong_thanh_cong.atlas')
 
-print()
+for node in atlas.nodes():
+    print(node)
