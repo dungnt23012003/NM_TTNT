@@ -1,6 +1,7 @@
 import tkinter as tk
 from itertools import count
 from turtle import RawTurtle, TurtleScreen
+from moduled_proj import module
 
 from pyatlas.atlas import Atlas
 from pyproj import Geod
@@ -23,7 +24,7 @@ transformer = Transformer.from_crs("EPSG:4326", "EPSG:3857")
 inverse_transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326")
 wgs84_geod = Geod(ellps='WGS84')
 
-atlas = Atlas('phuong_thanh_cong.atlas')
+atlas = module.atlas
 
 X_1, Y_1 = transformer.transform(LAT_1, LONG_1)
 X_2, Y_2 = transformer.transform(LAT_2, LONG_2)
@@ -205,7 +206,7 @@ canvas2 = tk.Canvas(root, width=1151, height=781)
 canvas2.pack()
 
 screen = TurtleScreen(canvas2)
-screen.bgpic('map.gif')
+screen.bgpic(r"C:\Users\Admin\NM_TTNT\demo_atlas\map.gif")
 turtle = RawTurtle(screen)
 
 # Test

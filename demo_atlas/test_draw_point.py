@@ -44,14 +44,14 @@ def turtle_teleport_node(node):
 
 # Setup turtle
 screen = turtle.Screen()
-screen.bgpic('map.gif')
+screen.bgpic(r"C:\Users\Admin\NM_TTNT\demo_atlas\map.gif")
 screen.setup(2*MAP_WIDTH + 30, 2*MAP_HEIGHT + 30)
 turtle.speed(0)
 turtle.tracer(0, 0)
 turtle.width(3)
 
 # Test
-atlas = Atlas('phuong_thanh_cong_keep_all.atlas')
+atlas = Atlas(r"C:\Users\Admin\NM_TTNT\demo_atlas\phuong_thanh_cong_keep_all.atlas")
 
 for point in atlas.points():
     turtle_teleport(*lat_long_2_turtle_pos(*get_node_lat_long(point)))
