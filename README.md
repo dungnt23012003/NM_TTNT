@@ -31,3 +31,5 @@
    Chú ý đã chọn conda làm interpreter của chương trình, theo bước 1 mục 3.
    gõ lệnh conda list thấy có đủ các package đã cài trong file requirement + Shapely là xong.  
                                 
+9. Bo sung PyQt6 cho GUI moi
+      pip install PyQt6
