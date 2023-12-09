@@ -18,13 +18,13 @@
    Mở anaconda command gõ lệnh           conda install -c anaconda shapely
   proceed([y]/n)? chọn y
 
-7. Cài một số package khác = requirement.txt
+7. Cài một số package khác = requirements.txt
    + yêu cầu có file requirement.txt (mới đẩy lên github) trên máy cá nhân
    + tìm file geos_c.dll trên máy, copy paste vào mục C:\Users\Admin\miniconda3\Library\lib
-   + tìm file requirement.txt trên máy cá nhân và copy đường dẫn tới file này, giả sử là "C:\Users\Admin\Desktop\requirements3.txt"
+   + tìm file requirements.txt trên máy cá nhân và copy đường dẫn tới file này, giả sử là "C:\Users\Admin\Desktop\requirements.txt"
    + mở anaconda command gõ 2 lệnh:
        - conda install pip
-       - pip install -r C:\Users\Admin\Desktop\requirements3.txt
+       - pip install -r C:\Users\Admin\Desktop\requirements.txt
 
 8. Kiểm tra
    Vào lại VSCode, mở terminal = Ctrl + `.
