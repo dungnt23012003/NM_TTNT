@@ -24,7 +24,7 @@
    + tìm file requirement.txt trên máy cá nhân và copy đường dẫn tới file này, giả sử là "C:\Users\Admin\Desktop\requirements3.txt"
    + mở anaconda command gõ 2 lệnh:
        - conda install pip
-       - install pip -r C:\Users\Admin\Desktop\requirements3.txt
+       - pip install -r C:\Users\Admin\Desktop\requirements3.txt
 
 8. Kiểm tra
    Vào lại VSCode, mở terminal = Ctrl + `.
