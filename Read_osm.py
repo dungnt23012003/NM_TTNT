@@ -49,25 +49,25 @@ class Edge:
 
 class Osm:
 
-    Nodes = {}
+    Nodes = {}                                                          # tập node
 
     def __init__(self, map_osm_file_path):
         mydata = ElementTree.parse(map_osm_file_path)
         my_node = {}
-        for item in mydata.iterfind('node'):
+        for item in mydata.iterfind('node'):                            # tìm các item trong tập lớn có tên là node
             my_node[item.attrib['id']] = Node(item.attrib['id'], item.attrib['lat'], item.attrib['lon'])
 
         # for node in my_node.values():
         #     print(node.get_id() + ' ' + str(node.get_lat()) + ' ' + str(node.get_lon()))
 
-        for item in mydata.iterfind('way'):
+        for item in mydata.iterfind('way'):                             #tìm các item có tên way trong mỗi item m
             # print('way: ' + item.attrib['id'])
-            node_in_way = []
+            node_in_way = []                                            #tập các node trên 1 đường
             flag_is_way = False
             flag_is_oneway = False
             flag_is_footway = False
-
-            for tag in item.iterfind('tag'):
+                                                                        #?? tag, item, attribute là cái gì
+            for tag in item.iterfind('tag'):                            #tìm các item có tên tag trong mỗi item
                 if tag.attrib['k'] == 'highway':
                     flag_is_way = True
                 if tag.attrib['k'] == 'oneway' and tag.attrib['v'] == 'yes':

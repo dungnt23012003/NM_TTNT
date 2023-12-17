@@ -1,7 +1,7 @@
 import tkinter as tk
 from itertools import count
 from turtle import RawTurtle, TurtleScreen
-from moduled_proj import module
+
 
 from pyatlas.atlas import Atlas
 from pyproj import Geod
@@ -24,7 +24,7 @@ transformer = Transformer.from_crs("EPSG:4326", "EPSG:3857")
 inverse_transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326")
 wgs84_geod = Geod(ellps='WGS84')
 
-atlas = module.atlas
+atlas = Atlas(r"C:\Users\Admin\NM_TTNT\demo_atlas\phuong_thanh_cong.atlas")
 
 X_1, Y_1 = transformer.transform(LAT_1, LONG_1)
 X_2, Y_2 = transformer.transform(LAT_2, LONG_2)
@@ -155,13 +155,13 @@ def on_click(event_origin):
                     distance_from_start_to[out_edge.end()] = distance_from_start_to[current_node] + distance(*get_node_lat_long(current_node), *get_node_lat_long(out_edge.end()))
                     fringe.put((distance_from_start_to[out_edge.end()] + distance(*get_node_lat_long(out_edge.end()), *get_node_lat_long(end_node)), next(unique), out_edge.end()))
                     parent[out_edge.end()] = current_node
-
+        
         turtle.clear()
         previous_node = end_node
         current_node = parent[end_node]
         turtle_teleport(end_x, end_y)
         turtle.goto(lat_long_2_turtle_pos(*get_node_lat_long(end_node)))
-
+        
         while parent.get(current_node, current_node) != current_node:
             edge = edge_start_with_and_end_with(current_node, previous_node)
 
