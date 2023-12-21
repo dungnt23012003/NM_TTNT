@@ -1,10 +1,12 @@
 # This Python file uses the following encoding: utf-8
 from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtCore import QPointF, QPoint
+from PySide6.QtCore import QPointF
 
 point1 = QPointF()
 point2 = QPointF()
 flag = 0
+
+option = "by_car"
 
 class MapView(QtWidgets.QGraphicsView):
     def __init__(self, mapTopLeft = QtCore.QPointF(0, 0), mapBottomRight = QtCore.QPointF(0, 0), parent = None):
@@ -16,7 +18,6 @@ class MapView(QtWidgets.QGraphicsView):
 
         scene = QtWidgets.QGraphicsScene()
         self.setScene(scene)
-
 
     def setImage(self, filename):
         image = QtGui.QImage(filename)
@@ -34,11 +35,9 @@ class MapView(QtWidgets.QGraphicsView):
         self.mapTopLeft = point
         self.__process_new_point()
 
-
     def setBottomRight(self, point):
         self.mapBottomRight = point
         self.__process_new_point()
-
 
     def mapToMap(self, point):
         mapSceneRect = self.pixmapItem.sceneBoundingRect()
@@ -89,7 +88,7 @@ class MapView(QtWidgets.QGraphicsView):
             #point2 = control_processes.get_closest_node(point2)
             flag = 0
             #control_processes.draw(point1, point2)
-            control_processes.A_Star_search(self, point1, point2)
+            control_processes.A_Star_search(self, point1, point2, option)
         
 
     def __process_new_point(self):
@@ -105,6 +104,8 @@ class MapView(QtWidgets.QGraphicsView):
         spoint += mapSceneRect.topLeft()
 
         return spoint
+
+
 '''
 from control_processes import point1, point2
 

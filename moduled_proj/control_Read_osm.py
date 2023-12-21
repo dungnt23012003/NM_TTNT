@@ -58,18 +58,16 @@ class Osm:
         for item in mydata.iterfind('node'):                            # tìm các item trong tập lớn có tên là node
             my_node[item.attrib['id']] = Node(item.attrib['id'], item.attrib['lat'], item.attrib['lon'])
 
-        # for node in my_node.values():
-        #     print(node.get_id() + ' ' + str(node.get_lat()) + ' ' + str(node.get_lon()))
-
         for item in mydata.iterfind('way'):                             #tìm các item có tên way trong mỗi item m
             # print('way: ' + item.attrib['id'])
             node_in_way = []                                            #tập các node trên 1 đường
             flag_is_way = False
             flag_is_oneway = False
             flag_is_footway = False
-                                                                        #?? tag, item, attribute là cái gì
+            highway_tag = ''                                                            #?? tag, item, attribute là cái gì
             for tag in item.iterfind('tag'):                            #tìm các item có tên tag trong mỗi item
                 if tag.attrib['k'] == 'highway':
+                    highway_tag = tag.attrib['v']
                     flag_is_way = True
                 if tag.attrib['k'] == 'oneway' and tag.attrib['v'] == 'yes':
                     flag_is_oneway = True
@@ -82,10 +80,8 @@ class Osm:
                         node_in_way.append(node.attrib['ref'])
                         node_has_ways[node.attrib['ref']] = my_node[node.attrib['ref']]
                     for index in range(0, len(node_in_way) - 1):
-                        my_node[node_in_way[index]].add_edge(
-                            Edge(my_node[node_in_way[index]], my_node[node_in_way[index + 1]], 'footway'))
-                        my_node[node_in_way[index + 1]].add_edge(
-                            Edge(my_node[node_in_way[index + 1]], my_node[node_in_way[index]], 'footway'))
+                        my_node[node_in_way[index]].add_edge(Edge(my_node[node_in_way[index]], my_node[node_in_way[index + 1]], highway_tag))
+                        my_node[node_in_way[index + 1]].add_edge(Edge(my_node[node_in_way[index + 1]], my_node[node_in_way[index]], highway_tag))
                 else:
                     if flag_is_oneway is True:
                         for node in item.iterfind('nd'):
@@ -93,16 +89,16 @@ class Osm:
                             node_has_ways[node.attrib['ref']] = my_node[node.attrib['ref']]
                         for index in range(0, len(node_in_way) - 1):
                             my_node[node_in_way[index]].add_edge(
-                                Edge(my_node[node_in_way[index]], my_node[node_in_way[index + 1]], 'oneway'))
+                                Edge(my_node[node_in_way[index]], my_node[node_in_way[index + 1]], highway_tag))
                     else:
                         for node in item.iterfind('nd'):
                             node_in_way.append(node.attrib['ref'])
                             node_has_ways[node.attrib['ref']] = my_node[node.attrib['ref']]
                         for index in range(0, len(node_in_way) - 1):
                             my_node[node_in_way[index]].add_edge(
-                                Edge(my_node[node_in_way[index]], my_node[node_in_way[index + 1]], ''))
+                                Edge(my_node[node_in_way[index]], my_node[node_in_way[index + 1]], highway_tag))
                             my_node[node_in_way[index + 1]].add_edge(
-                                Edge(my_node[node_in_way[index + 1]], my_node[node_in_way[index]], ''))
+                                Edge(my_node[node_in_way[index + 1]], my_node[node_in_way[index]], highway_tag))
 
         self.Nodes = my_node
         self.Nodes_have_ways = node_has_ways
@@ -112,3 +108,6 @@ class Osm:
             print('node ' + node.get_id())
             for nei in node.edges:
                 print(nei.end().get_id() + ' tag: ' + nei.get_tag())
+
+# map = Osm(r"C:\Users\Tuand\PycharmProjects\NM_TTNT\moduled_proj\models_phuongthanhcong.osm")
+# map.print_all_node()

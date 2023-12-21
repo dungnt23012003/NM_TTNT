@@ -13,3 +13,4 @@ pyatlas==5.8.9
 pyproj==3.6.1
 six==1.16.0
 Werkzeug==3.0.1
+PySide6~=6.6.1
