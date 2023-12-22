@@ -10,8 +10,8 @@ from models_mapview import MapView
 import queue
 
 # graph = Osm(r"C:\Users\Tuand\PycharmProjects\NM_TTNT\moduled_proj\models_phuongthanhcong.osm")
-# graph = Osm(r"C:\Users\Admin\NM_TTNT\moduled_proj\models_phuongthanhcong.osm")
-graph = Osm(r"models_phuongthanhcong.osm")
+graph = Osm(r"C:\Users\Admin\Downloads\NM_TTNT-3c5e36067ee5c1cdc97eee50e03de384233a82c6\NM_TTNT-3c5e36067ee5c1cdc97eee50e03de384233a82c6\moduled_proj\models_phuongthanhcong.osm")
+#graph = Osm(r"models_phuongthanhcong.osm")
 
 unique = count()
 
@@ -47,7 +47,7 @@ def get_closest_node(c_point, option):
             if edge.end() not in close:
                 if check_base_on_option(edge.get_tag(), option):
                     if (distance(node.get_lat(), node.get_lon(), c_point.x(), c_point.y()) < distance(closest_node.get_lat(), closest_node.get_lon(), c_point.x(), c_point.y())):
-                        closest_node = edge.end()
+                        closest_node = node
                 close.add(edge.end())
 
     return closest_node
@@ -62,8 +62,6 @@ def A_Star_search(mapp, poi1, poi2, option):
     start_point = get_closest_node(poi1, option)
     end_point = get_closest_node(poi2, option)
 
-    print(start_point.get_id())
-    print(end_point.get_id())
     pen = QPen()
     pen.setStyle(Qt.PenStyle.DotLine)
     mapp.addLineOnMap(poi1, QPointF(start_point.get_lat(), start_point.get_lon()), pen)
@@ -80,57 +78,40 @@ def A_Star_search(mapp, poi1, poi2, option):
 
     while not fringe.empty() :
         current_node = fringe.get()[1]
+
         cur_point = QPointF(current_node.get_lat(), current_node.get_lon())
         parcur_point = QPointF(parent[current_node].get_lat(), parent[current_node].get_lon())
 
          # add line to cur node:
         mapp.addLineOnMap(parcur_point, cur_point)
 
-        if current_node.get_id() == end_point.get_id():
+        if current_node.get_id() == end_point.get_id() :
             break
-        count_way = 0
-        flag_can_go_only_option = False
+
         for out_edge in current_node.edges:
-            if count_way >= 2:
-                flag_can_go_only_option = True
-                break
-            if out_edge.end() not in closed and check_base_on_option(out_edge.get_tag(), option):
-                count_way = count_way + 1
-
-        if flag_can_go_only_option:
-            for out_edge in current_node.edges:
-                if out_edge.end() not in closed and check_base_on_option(out_edge.get_tag(), option):
-                    closed.add(out_edge.end())
-                    dis_from_start_to[out_edge.end()] = dis_from_start_to[current_node] + distance(current_node.get_lat(), current_node.get_lon(), (out_edge.end()).get_lat(), (out_edge.end()).get_lon())
-                    fringe.put((dis_from_start_to[out_edge.end()] + distance(out_edge.end().get_lat(), out_edge.end().get_lon(), end_point.get_lat(), end_point.get_lon()), out_edge.end()))
-                    parent[out_edge.end()] = current_node
-        else:
-            for out_edge in current_node.edges:
-                if out_edge.end() not in closed:  # tag way?
-                    closed.add(out_edge.end())
-                    dis_from_start_to[out_edge.end()] = dis_from_start_to[current_node] + distance(current_node.get_lat(), current_node.get_lon(), (out_edge.end()).get_lat(), (out_edge.end()).get_lon())
-                    fringe.put((dis_from_start_to[out_edge.end()] + distance(out_edge.end().get_lat(), out_edge.end().get_lon(), end_point.get_lat(), end_point.get_lon()), out_edge.end()))
-                    parent[out_edge.end()] = current_node
-
+            if out_edge.end() not in closed and check_base_on_option(out_edge.get_tag(), option):       # tag way?
+                closed.add(out_edge.end())
+                dis_from_start_to[out_edge.end()] = dis_from_start_to[current_node] + distance(current_node.get_lat(), current_node.get_lon(), (out_edge.end()).get_lat(), (out_edge.end()).get_lon())
+                fringe.put((dis_from_start_to[out_edge.end()] + distance(out_edge.end().get_lat(), out_edge.end().get_lon(), end_point.get_lat(), end_point.get_lon()), out_edge.end()))
+                parent[out_edge.end()] = current_node
 
     mapp.reset()
     previous_node = end_point
     current_node = parent.get(end_point)
-    # ep = QPointF(previous_node.get_lat(), previous_node.get_lon())
-    # pep = QPointF(current_node.get_lat(), current_node.get_lon())
+    ep = QPointF(previous_node.get_lat(), previous_node.get_lon())
+    pep = QPointF(current_node.get_lat(), current_node.get_lon())
     #mapp.addLineOnMap(ep, pep)
     # mapp.addLineOnMap(ep, Q)
-    # print(Q.x(), Q.y())
+    print(Q.x(), Q.y())
 
     mapp.addLineOnMap(poi2, QPointF(end_point.get_lat(), end_point.get_lon()), pen)
 
-    while parent.get(current_node) != current_node:
+    while parent.get(current_node) != current_node :
         ep = QPointF(previous_node.get_lat(), previous_node.get_lon())
         pep = QPointF(current_node.get_lat(), current_node.get_lon())
         mapp.addLineOnMap(ep, pep)
         previous_node = current_node
         current_node = parent.get(current_node)
-        print(current_node.get_id())
     
     ep = QPointF(previous_node.get_lat(), previous_node.get_lon())
     pep = QPointF(current_node.get_lat(), current_node.get_lon())
