@@ -52,13 +52,13 @@ screen.bgpic('map.gif')
 screen.setup(2*MAP_WIDTH + 30, 2*MAP_HEIGHT + 30)
 turtle.speed(0)
 turtle.width(2)
-turtle.tracer(100, 0)
+turtle.tracer(0, 0)
 
 # Test
 atlas = Atlas('phuong_thanh_cong.atlas')
 
 for edge in atlas.edges():
-    if edge.get_highway_tag_value() is not None and edge.get_highway_tag_value() == 'service':
+    if edge.get_highway_tag_value() is not None and edge.get_highway_tag_value() == 'footway':
         turtle_teleport(*lat_long_2_turtle_pos(*get_node_lat_long(edge.start())))
         for location in edge.as_polyline().locations():
             turtle.goto(*lat_long_2_turtle_pos(*get_location_lat_long(location)))
