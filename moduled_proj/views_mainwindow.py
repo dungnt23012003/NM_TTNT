@@ -39,6 +39,17 @@ if __name__ == "__main__":
     window.footButton.clicked.connect(lambda: window.mapView.setOption("on_foot"))
     window.carButton.clicked.connect(lambda: window.mapView.setOption("by_car"))
 
+    def setLineColor():
+        window.mapView.setStartColor(QtGui.QColor(int(window.startColor.text(), 16)))
+        window.mapView.setEndColor(QtGui.QColor(int(window.endColor.text(), 16)))
+        window.mapView.setInitialDuration(int(window.initialDuration.text()))
+        window.mapView.setDurationStep(int(window.durationStep.text()))
+    window.setColorButton.pressed.connect(setLineColor)
+
+    window.rateButton.pressed.connect(lambda: window.mapView.setLineRate(int(window.lineRate.text())))
+
+    setLineColor()
+
     window.show()
 
     sys.exit(app.exec())

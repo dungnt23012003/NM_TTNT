@@ -23,7 +23,7 @@
       <property name="spacing">
        <number>10</number>
       </property>
-      <item alignment="Qt::AlignHCenter|Qt::AlignTop">
+      <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
        <widget class="QRadioButton" name="footButton">
         <property name="text">
          <string>Foot</string>
@@ -33,10 +33,138 @@
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignHCenter|Qt::AlignTop">
+      <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
        <widget class="QRadioButton" name="carButton">
         <property name="text">
          <string>Car</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Start Color</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignTop">
+       <widget class="QLineEdit" name="startColor">
+        <property name="maximumSize">
+         <size>
+          <width>75</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>00B4D8</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>End Color</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignTop">
+       <widget class="QLineEdit" name="endColor">
+        <property name="maximumSize">
+         <size>
+          <width>75</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>03045E</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Initial Duration</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignTop">
+       <widget class="QLineEdit" name="initialDuration">
+        <property name="maximumSize">
+         <size>
+          <width>50</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>500</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Step</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignTop">
+       <widget class="QLineEdit" name="durationStep">
+        <property name="maximumSize">
+         <size>
+          <width>50</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>5</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignTop">
+       <widget class="QPushButton" name="setColorButton">
+        <property name="text">
+         <string>Set Color</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Line Rate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineRate">
+        <property name="maximumSize">
+         <size>
+          <width>50</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="rateButton">
+        <property name="text">
+         <string>Set Rate</string>
         </property>
        </widget>
       </item>
@@ -53,13 +181,18 @@
         </property>
        </spacer>
       </item>
-      <item alignment="Qt::AlignVCenter">
+      <item alignment="Qt::AlignBottom">
        <widget class="QSlider" name="slider">
         <property name="maximumSize">
          <size>
           <width>200</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#slider {
+	margin: 20px 0px -15px 0px;
+}</string>
         </property>
         <property name="minimum">
          <number>100</number>

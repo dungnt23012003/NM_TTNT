@@ -3,6 +3,8 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtCore import QPointF
 from PySide6.QtCore import Qt
 
+from fading_graphics_line_item import FadingGraphicsLineItem
+
 import queue
 
 point1 = QPointF()
@@ -23,22 +25,29 @@ class MapView(QtWidgets.QGraphicsView):
         scene = QtWidgets.QGraphicsScene()
         self.setScene(scene)
 
-        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.NoAnchor)
-        # self.setViewportUpdateMode(QtWidgets.QGraphicsView.ViewportUpdateMode.NoViewportUpdate)
+        self.setViewportUpdateMode(QtWidgets.QGraphicsView.ViewportUpdateMode.NoViewportUpdate)
+        self.updateTimer = QtCore.QTimer(self)
+        self.updateTimer.setInterval(int(1000/60))
+        self.updateTimer.start()
+        self.updateTimer.timeout.connect(lambda: self.scene().update())
 
         self.viewBuffer = queue.Queue()
+        self.lineRate = 3
+        self.bufferTimer = QtCore.QTimer(self)
+        self.bufferTimer.setInterval(self.lineRate)
+        self.bufferTimer.start()
+        self.bufferTimer.timeout.connect(self.processBuffer)
 
-        self.timer = QtCore.QTimer(self)
-        self.timer.setInterval(int(1000/480))
-        # self.timer.setInterval(0)
+        self.defaultDuration = 800
+        self.currentDuration = self.defaultDuration
+        self.durationStep = 5
 
-        self.timer.start()
-
-        self.timer.timeout.connect(self.processBuffer)
+        self.startColor = QtGui.QColor(0x000000)
+        self.endColor = QtGui.QColor(0x000000)
 
     def processBuffer(self):
         if self.viewBuffer.empty():
-            self.timer.stop()
+            self.bufferTimer.stop()
             return
 
         item = self.viewBuffer.get()
@@ -97,10 +106,17 @@ class MapView(QtWidgets.QGraphicsView):
         npoint_2 = self.__mapFromMapToScene(point_2)
         pen.setWidthF(3)
 
-        return self.scene().addLine(npoint_1.x(), npoint_1.y(), npoint_2.x(), npoint_2.y(), pen)
+        line = QtCore.QLineF(npoint_1, npoint_2)
+
+        fading_item = FadingGraphicsLineItem(self.startColor, self.endColor, self.currentDuration, pen)
+        self.currentDuration += self.durationStep
+
+        fading_item.setLine(line)
+
+        return self.scene().addItem(fading_item)
 
     def addLineOnMap(self, point_1, point_2, pen = QtGui.QPen()):
-        self.timer.start()
+        self.bufferTimer.start()
         self.viewBuffer.put((point_1, point_2, pen))
 
     def addPointOnMap(self, point, pen = QtGui.QPen()):
@@ -118,6 +134,7 @@ class MapView(QtWidgets.QGraphicsView):
             point = event.pos()
             point1 = self.mapToMap(point)
 
+            self.currentDuration = self.defaultDuration
             self.resetInstantly()
             self.addPointOnMap(point1 + QPointF(0, 0))
             #print(point1.x(), point1.y())
@@ -156,6 +173,22 @@ class MapView(QtWidgets.QGraphicsView):
     def setOption(self, vehicle):
         global option
         option = vehicle
+
+    def setStartColor(self, color):
+        self.startColor = color
+
+    def setEndColor(self, color):
+        self.endColor = color
+
+    def setInitialDuration(self, duration):
+        self.currentDuration = duration
+
+    def setDurationStep(self, step):
+        self.durationStep = step
+
+    def setLineRate(self, rate):
+        self.lineRate = rate
+        self.bufferTimer.setInterval(rate)
 
 '''
 from control_processes import point1, point2
