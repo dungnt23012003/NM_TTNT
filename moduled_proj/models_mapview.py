@@ -55,6 +55,8 @@ class MapView(QtWidgets.QGraphicsView):
         self.pixmapItem = self.scene().addPixmap(self.pixmap)
         self.pixmapItem.setScale(0.5)
 
+        self.scene().setSceneRect(self.scene().sceneRect())
+
     def reset(self):
         self.viewBuffer.put(0)
 
