@@ -10,30 +10,35 @@ from models_mapview import MapView
 map = MapView
 
 def changeViewZoom(value):
-    window.mapView.setTransform(QtGui.QTransform.fromScale(value/50, value/50))
+    window.mapView.setTransform(QtGui.QTransform.fromScale(value/100, value/100))
+
+
 QApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
 
 if __name__ == "__main__":
     
     app = QApplication([])
-    ui_file = QtCore.QFile(r"C:\Users\Tuand\PycharmProjects\NM_TTNT\moduled_proj\views_mainwindow.ui")
+    # ui_file = QtCore.QFile(r"C:\Users\Tuand\PycharmProjects\NM_TTNT\moduled_proj\views_mainwindow.ui")
     # ui_file = QtCore.QFile(r"C:\Users\Admin\NM_TTNT\moduled_proj\views_mainwindow.ui")
+    ui_file = QtCore.QFile(r"views_mainwindow.ui")
+
     ui_file.open(QtCore.QFile.ReadOnly)
 
     loader = QUiLoader()
     loader.registerCustomWidget(map)
 
     window = loader.load(ui_file)
-    window.mapView.setImage(r"C:\Users\Tuand\PycharmProjects\NM_TTNT\moduled_proj\models_map.png")
+    # window.mapView.setImage(r"C:\Users\Tuand\PycharmProjects\NM_TTNT\moduled_proj\models_map.png")
     # window.mapView.setImage(r"C:\Users\Admin\NM_TTNT\moduled_proj\models_map.png")
+    window.mapView.setImage(r"models_map.png")
+
     window.mapView.setTopLeft(QtCore.QPointF(21.02761, 105.80665))
     window.mapView.setBottomRight(QtCore.QPointF(21.01390, 105.82438))
 
-    window.mapView.addCircleOnMap(QtCore.QPointF(21.0167680, 105.8149337), 10)
-
     window.slider.valueChanged.connect(changeViewZoom)
+    window.footButton.clicked.connect(lambda: window.mapView.setOption("on_foot"))
+    window.carButton.clicked.connect(lambda: window.mapView.setOption("by_car"))
 
     window.show()
-
 
     sys.exit(app.exec())
